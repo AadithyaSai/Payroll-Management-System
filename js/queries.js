@@ -7,6 +7,7 @@ const connection = mysql.createConnection({
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: "payroll",
+  multipleStatements: true,
 });
 
 const connectToMySQL = () => connection.connect();
@@ -24,7 +25,7 @@ const disconnectFromMySQL = () => connection.end();
 function returnPromise(sql, ...args) {
   // Helper function to simplify the process of returning a promise for mysql results
 
-  return Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     connection.query(sql, args, (err, result) => {
       if (err) throw err;
 
@@ -42,14 +43,14 @@ function register(username, password) {
 }
 
 function getCompanies() {
-  let sql = "SELECT * FROM companies";
+  let sql = "SELECT * FROM company";
 
   return returnPromise(sql);
 }
 
 function getCompanyDetails(companyId) {
   let sql =
-    "SELECT * FROM companies, employee WHERE company.company_id=? AND employee.company=company_id";
+    "SELECT * FROM company, employee WHERE company.company_id=? AND employee.company=company_id";
 
   return returnPromise(sql, companyId);
 }
@@ -99,11 +100,11 @@ function createEmployee(
 function deleteEmployee(empId) {
   let sql = "DELETE FROM employee WHERE emp_id=?";
 
-  returnPromise(sql, empId);
+  return returnPromise(sql, empId);
 }
 
 function deleteCompany(companyId) {
   let sql = "DELETE FROM company WHERE company_id=?";
 
-  returnPromise(sql, companyId);
+  return returnPromise(sql, companyId);
 }
