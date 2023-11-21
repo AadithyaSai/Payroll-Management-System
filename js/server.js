@@ -74,6 +74,14 @@ app.delete("/employee:empid", function (req, res) {
   res.send({ content: `Delete employee with id ${empId}` });
 });
 
+app.delete("/company/:companyid", function (req, res) {
+  let empId = req.params.companyid;
+
+  res.send({
+    content: `Delete company with id ${companyId} along with all its employees`,
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);
 });
