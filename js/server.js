@@ -58,6 +58,11 @@ app.post("/employee", function (req, res) {
   let email = req.query.email;
   let company = req.query.company;
 
+  let baseSalary = req.query.baseSalary;
+  let allowancePercent = req.query.allowancePercent;
+  let bonusPercent = req.query.bonusPercent;
+  let insurancePercent = req.query.insurancePercent;
+
   res.send({
     content: `Create employee with ${empName}, ${empAddr}, ${phNo}, ${email} and ${company}`,
   });
