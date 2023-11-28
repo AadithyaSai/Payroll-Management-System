@@ -1,90 +1,65 @@
 require("dotenv").config();
 const mysql = require("mysql");
 
-const connection = mysql.createConnection({
-  host: "payroll-management.caifrqvpkagx.ap-south-1.rds.amazonaws.com",
-  port: 3306,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: "payroll",
-  multipleStatements: true,
-});
-
-const connectToMySQL = () => connection.connect();
-const disconnectFromMySQL = () => connection.end();
-
-// WARNING: Always ensure that connectToMySQL is called before executing a query,
-//          and the connection is freed when the app closes
-
-// Basic query example
-// connection.query("SELECT * FROM company", function (error, results, fields) {
-//   if (error) throw error;
-//   console.log("The solution is: ", results);
-// });
-
-function returnPromise(sql, ...args) {
-  // Helper function to simplify the process of returning a promise for mysql results
-
-  return new Promise((resolve, reject) => {
-    connection.query(sql, args, (err, result) => {
-      if (err) throw err;
-
-      resolve(result);
+class Query {
+  constructor() {
+    this.connection = mysql.createConnection({
+      host: "payroll-management.caifrqvpkagx.ap-south-1.rds.amazonaws.com",
+      port: 3306,
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: "payroll",
+      multipleStatements: true,
     });
-  });
-}
+  }
 
-function login(username, password) {
-  // TODO: Make schema for username and password first
-}
+  returnPromise(sql, ...args) {
+    // Helper to simplify the process of returning a promise for mysql results
 
-function register(username, password) {
-  // TODO: Make schema for username and password first
-}
+    return new Promise((resolve, reject) => {
+      this.connection.query(sql, args, (err, result) => {
+        if (err) throw err;
 
-function getCompanies() {
-  let sql = "SELECT * FROM company";
+        resolve(result);
+      });
+    });
+  }
 
-  return returnPromise(sql);
-}
+  login(username, password) {
+    // TODO: Make schema for username and password first
+  }
 
-function getCompanyDetails(companyId) {
-  let sql =
-    "SELECT * FROM company, employee WHERE company.company_id=? AND employee.company=company_id";
+  register(username, password) {
+    // TODO: Make schema for username and password first
+  }
 
-  return returnPromise(sql, companyId);
-}
+  getCompanies() {
+    let sql = "SELECT * FROM company";
 
-function getEmployee(empId) {
-  let sql = "SELECT  * FROM employee WHERE emp_no=?";
+    return this.returnPromise(sql);
+  }
 
-  return returnPromise(sql, empId);
-}
+  getCompanyDetails(companyId) {
+    let sql =
+      "SELECT * FROM company, employee WHERE company.company_id=? AND employee.company=company_id";
 
-function createCompany(companyName, companyAddress) {
-  let sql = "INSERT INTO company(company_name, address) VALUES(?, ?)";
+    return this.returnPromise(sql, companyId);
+  }
 
-  return returnPromise(sql, companyName, companyAddress);
-}
+  getEmployee(empId) {
+    let sql =
+      "SELECT * FROM employee, salary WHERE salary.emp_id=employee.emp_id AND employee.emp_id=?";
 
-function createEmployee(
-  empName,
-  empAddr,
-  phNo,
-  email,
-  company,
-  baseSalary,
-  allowancePercent,
-  bonusPercent,
-  insurancePercent
-) {
-  let sql = `
-    INSERT INTO employee(emp_name, address, ph_no, email, company) VALUES(?, ?, ?, ?, ?);
-    INSERT INTO salary VALUES (@@IDENTITY, ?, ?, ?, ?);
-    `;
+    return this.returnPromise(sql, empId);
+  }
 
-  return returnPromise(
-    sql,
+  createCompany(companyName, companyAddress) {
+    let sql = "INSERT INTO company(company_name, address) VALUES(?, ?)";
+
+    return this.returnPromise(sql, companyName, companyAddress);
+  }
+
+  createEmployee(
     empName,
     empAddr,
     phNo,
@@ -94,17 +69,37 @@ function createEmployee(
     allowancePercent,
     bonusPercent,
     insurancePercent
-  );
+  ) {
+    let sql = `
+      INSERT INTO employee(emp_name, address, ph_no, email, company) VALUES(?, ?, ?, ?, ?);
+      INSERT INTO salary VALUES (@@IDENTITY, ?, ?, ?, ?);
+      `;
+
+    return this.returnPromise(
+      sql,
+      empName,
+      empAddr,
+      phNo,
+      email,
+      company,
+      baseSalary,
+      allowancePercent,
+      bonusPercent,
+      insurancePercent
+    );
+  }
+
+  deleteEmployee(empId) {
+    let sql = "DELETE FROM employee WHERE emp_id=?";
+
+    return this.returnPromise(sql, empId);
+  }
+
+  deleteCompany(companyId) {
+    let sql = "DELETE FROM company WHERE company_id=?";
+
+    return this.returnPromise(sql, companyId);
+  }
 }
 
-function deleteEmployee(empId) {
-  let sql = "DELETE FROM employee WHERE emp_id=?";
-
-  return returnPromise(sql, empId);
-}
-
-function deleteCompany(companyId) {
-  let sql = "DELETE FROM company WHERE company_id=?";
-
-  return returnPromise(sql, companyId);
-}
+module.exports = Query;

@@ -1,6 +1,7 @@
 const express = require("express");
 const basicAuth = require("express-basic-auth");
 const cors = require("cors");
+const Query = require("./queries");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -9,6 +10,8 @@ app.use(express.static(__dirname));
 
 app.use(cors());
 app.options("*", cors()); // enable pre-flight
+
+const query = new Query();
 
 app.get("/", function (req, res) {
   res.send({ content: "Test" });
@@ -19,23 +22,29 @@ app.get("/login", function (req, res) {
 });
 
 app.get("/company", function (req, res) {
-  res.send({ content: "List of companies" });
+  query
+    .getCompanies()
+    .then((result) => res.status(200).send(result))
+    .catch((err) => res.status(500).send(err));
 });
 
 app.get("/company/:companyid", function (req, res) {
+  // FIXME: Doesnt work for Company 1001 even tho it exists?
   let companyId = req.params.companyid;
 
-  res.send({
-    content: `deets of company ${companyId} and basic deets of its employees`,
-  });
+  query
+    .getCompanyDetails(companyId)
+    .then((result) => res.status(200).send(result))
+    .catch((err) => res.status(500).send(err));
 });
 
 app.get("/employee/:empid", function (req, res) {
   let empId = req.params.empid;
 
-  res.send({
-    content: `deets of employee ${empId} and salary splitup`,
-  });
+  query
+    .getEmployee(empId)
+    .then((result) => res.status(200).send(result))
+    .catch((err) => res.status(500).send(err));
 });
 
 app.post("/register", function (req, res) {
@@ -46,9 +55,10 @@ app.post("/company", function (req, res) {
   let companyName = req.query.companyName;
   let companyAddress = req.query.companyAddress;
 
-  res.send({
-    content: `Create company with ${companyName} and ${companyAddress}`,
-  });
+  query
+    .createCompany(companyName, companyAddress)
+    .then((result) => res.status(200).send(result))
+    .catch((err) => res.status(500).send(err));
 });
 
 app.post("/employee", function (req, res) {
@@ -63,23 +73,38 @@ app.post("/employee", function (req, res) {
   let bonusPercent = req.query.bonusPercent;
   let insurancePercent = req.query.insurancePercent;
 
-  res.send({
-    content: `Create employee with ${empName}, ${empAddr}, ${phNo}, ${email} and ${company}`,
-  });
+  query
+    .createEmployee(
+      empName,
+      empAddr,
+      phNo,
+      email,
+      company,
+      baseSalary,
+      allowancePercent,
+      bonusPercent,
+      insurancePercent
+    )
+    .then((result) => res.status(200).send(result))
+    .catch((err) => res.status(500).send(err));
 });
 
 app.delete("/employee:empid", function (req, res) {
   let empId = req.params.empid;
 
-  res.send({ content: `Delete employee with id ${empId}` });
+  query
+    .deleteEmployee(empId)
+    .then(() => res.sendStatus(200))
+    .catch((err) => res.status(500).send(err));
 });
 
 app.delete("/company/:companyid", function (req, res) {
-  let empId = req.params.companyid;
+  let companyId = req.params.companyid;
 
-  res.send({
-    content: `Delete company with id ${companyId} along with all its employees`,
-  });
+  query
+    .deleteEmployee(companyId)
+    .then(() => res.sendStatus(200))
+    .catch((err) => res.status(500).send(err));
 });
 
 app.listen(PORT, () => {
