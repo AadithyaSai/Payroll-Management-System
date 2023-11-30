@@ -18,7 +18,10 @@ class Query {
 
     return new Promise((resolve, reject) => {
       this.connection.query(sql, args, (err, result) => {
-        if (err) throw err;
+        if (err) {
+          console.log(err);
+          return {};
+        }
 
         resolve(result);
       });
