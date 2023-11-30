@@ -44,7 +44,7 @@ class Query {
 
   getCompanyDetails(companyId) {
     let sql =
-      "SELECT * FROM company, employee WHERE company.company_id=? AND employee.company=company_id";
+      "SELECT * FROM company, employee WHERE company.company_id=? AND employee.company_id=company.company_id";
 
     return this.returnPromise(sql, companyId);
   }
@@ -74,7 +74,7 @@ class Query {
     insurancePercent
   ) {
     let sql = `
-      INSERT INTO employee(emp_name, address, ph_no, email, company) VALUES(?, ?, ?, ?, ?);
+      INSERT INTO employee(emp_name, address, ph_no, email, company_id) VALUES(?, ?, ?, ?, ?);
       INSERT INTO salary VALUES (@@IDENTITY, ?, ?, ?, ?);
       `;
 

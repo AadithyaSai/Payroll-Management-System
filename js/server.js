@@ -29,7 +29,6 @@ app.get("/company", function (req, res) {
 });
 
 app.get("/company/:companyid", function (req, res) {
-  // FIXME: Doesnt work for Company 1001 even tho it exists?
   let companyId = req.params.companyid;
 
   query
