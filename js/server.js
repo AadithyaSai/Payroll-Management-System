@@ -93,7 +93,10 @@ app.delete("/employee/:empid", function (req, res) {
 
   query
     .deleteEmployee(empId)
-    .then(() => res.sendStatus(200))
+    .then((result) => {
+      if (result[0].affectedRows != 0) res.sendStatus(200);
+      else res.status(500).send(`No such employee by id ${companyId}`);
+    })
     .catch((err) => res.status(500).send(err));
 });
 
@@ -102,7 +105,10 @@ app.delete("/company/:companyid", function (req, res) {
 
   query
     .deleteCompany(companyId)
-    .then(() => res.sendStatus(200))
+    .then((result) => {
+      if (result[0].affectedRows != 0) res.sendStatus(200);
+      else res.status(500).send(`No such company by id ${companyId}`);
+    })
     .catch((err) => res.status(500).send(err));
 });
 
