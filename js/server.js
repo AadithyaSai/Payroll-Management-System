@@ -98,10 +98,10 @@ app.delete("/employee/:empid", function (req, res) {
 });
 
 app.delete("/company/:companyid", function (req, res) {
-  let companyId = req.params.companyId;
+  let companyId = req.params.companyid;
 
   query
-    .deleteEmployee(companyId)
+    .deleteCompany(companyId)
     .then(() => res.sendStatus(200))
     .catch((err) => res.status(500).send(err));
 });
