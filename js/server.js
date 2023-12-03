@@ -98,7 +98,7 @@ app.delete("/employee/:empid", function (req, res) {
 });
 
 app.delete("/company/:companyid", function (req, res) {
-  let companyId = req.params.companyid;
+  let companyId = req.params.companyId;
 
   query
     .deleteEmployee(companyId)
