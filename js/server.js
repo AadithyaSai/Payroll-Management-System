@@ -88,7 +88,7 @@ app.post("/employee", function (req, res) {
     .catch((err) => res.status(500).send(err));
 });
 
-app.delete("/employee:empid", function (req, res) {
+app.delete("/employee/:empid", function (req, res) {
   let empId = req.params.empid;
 
   query
